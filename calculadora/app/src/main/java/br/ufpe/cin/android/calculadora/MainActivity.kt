@@ -14,6 +14,8 @@ import java.lang.NumberFormatException
 
 // Creathe the class as an OnClick Listener
 class MainActivity : AppCompatActivity() , View.OnClickListener{
+    var writtenText:String = ""
+    var resultText:String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,25 +48,26 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
         when (v) {
             // Botoões que somente escrevem
             btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_9, btn_Add, btn_Divide, btn_Dot, btn_LParen, btn_Multiply, btn_Power, btn_RParen, btn_Subtract -> {
-                text_calc.setText(text_calc.text.toString() + (v as Button).text.toString())
+                writtenText = writtenText + (v as Button).text.toString();
+                text_calc.setText(writtenText)
             }
 
-            //Botão e Apagar
+            //Botão e Apaga
             btn_Clear -> {
-                var text = text_calc.text.toString();
-                text = text.substring(0, text.length - 1);
-                text_calc.setText(text)
+                if (writtenText != "") {
+                    writtenText = writtenText.substring(0, writtenText.length - 1);
+                    text_calc.setText(writtenText)
+                }
             }
 
-            //Botão de escrever
+            //Botão de Resultado
             btn_Equal -> {
                 print("EQUAL")
-                var text = text_calc.text.toString();
-
                 // Try Catch to see if the expression is valid
-                try {
+                try{
                     // If it is, show it!
-                    text_info.text = eval(text).toString();
+                    resultText = eval(writtenText).toString()
+                    text_info.text = resultText
                 }
                 catch (e: Throwable) {
                     // If not, show a Toast
@@ -168,5 +171,34 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
                 return x
             }
         }.parse()
+    }
+
+
+//    Save and restore Instance States
+    override fun onSaveInstanceState(outState: Bundle?) {
+        // Save the user's current game state
+        outState?.run {
+            putString(WRITTEN_TEXT, writtenText)
+            putString(RESULT, resultText)
+        }
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState)
+
+        // Restore state members from saved instance
+        savedInstanceState?.run {
+            writtenText = getString(WRITTEN_TEXT)!!
+            resultText = getString(RESULT)!!
+        }
+    }
+
+    companion object {
+        val WRITTEN_TEXT = ""
+        val RESULT = ""
     }
 }
